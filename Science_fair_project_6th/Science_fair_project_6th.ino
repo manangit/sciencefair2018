@@ -18,6 +18,7 @@ boolean takeLowTime;
 int porchLight = 2;         // Prorch light should be conected to pin 2 on the arduino
 int coachLights = 4;        // Coach lights should be conected to pin 4 on the arduino
 int backyardLight = 8;      // Backyard light should be conected to pin 8 on the arduino
+int floodLight = 9;
 int switchPin = 12;         // Switch should be conected to pin 12 on the arduino
 bool isPorchLightOn = false; // To track if the light is on or off
 bool areCoachLightsOn = false; // To track if the light is on or off
@@ -43,6 +44,7 @@ void setup()               // It is used to initialize variables, pin modes, etc
   pinMode(porchLight, OUTPUT); // Telling the arduino that the Light pin is an output
   pinMode(coachLights, OUTPUT); // Telling the arduino that the Light pin is an output
   pinMode(backyardLight, OUTPUT); // Telling the arduino that the Light pin is an output
+  pinMode(floodLight, OUTPUT);  // Telling the arduino that the Light pin is an output
   pinMode(switchPin, INPUT); // Telling the arduino that Switch pin is an input
   pinMode(pirPin, INPUT);
   display.setBrightness(10); // Set brightness of LED display to 100%
@@ -124,7 +126,7 @@ void loop()                 // This function runs forever until it is on
   irrecv.resume(); // Receive the next value
   delay(250);
   if (digitalRead(pirPin) == HIGH) {
-    digitalWrite(porchLight, HIGH);   //the led visualizes the sensors output pin state
+    digitalWrite(floodLight, HIGH);   //the led visualizes the sensors output pin state
     if (lockLow) {
       //makes sure we wait for a transition to LOW before any further output is made:
       lockLow = false;
@@ -132,7 +134,7 @@ void loop()                 // This function runs forever until it is on
     takeLowTime = true;
   }
   if (digitalRead(pirPin) == LOW) {
-    digitalWrite(porchLight, LOW);
+    digitalWrite(floodLight, LOW);
     if (takeLowTime) {
       lowIn = millis();
       takeLowTime = false;

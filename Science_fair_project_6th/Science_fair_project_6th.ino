@@ -23,6 +23,8 @@ int switchPin = 12;         // Switch should be conected to pin 12 on the arduin
 bool isPorchLightOn = false; // To track if the light is on or off
 bool areCoachLightsOn = false; // To track if the light is on or off
 bool isBackyardLightOn = false; // To track if the light is on or off
+int pirPin = 11;
+int servoMotor = 13;
 
 int RECV_PIN = 10;           //IR sensor should be conected to pin 10 on the arduino
 long ONE = 16724175;
@@ -30,14 +32,19 @@ long TWO = 16718055;
 long THREE = 16743045;
 long FOUR = 16716015;
 long FIVE = 16726215;
-long timer = 0;             //
-
-int pirPin = 11;
-
-int value;
-
 IRrecv irrecv(RECV_PIN);
 decode_results results;
+
+long timer = 0;
+
+String passwordValue1 = "";
+String passwordValue2 = "";
+String passwordValue3 = "";
+String passwordValue4 = "";
+String correctPassword = "1234";
+String inputPassword = "";
+int wrongPasswordLight = 3;
+int rightPasswordLight = 5;
 
 void setup()               // It is used to initialize variables, pin modes, etc. The setup function will only run once.
 {
@@ -45,53 +52,44 @@ void setup()               // It is used to initialize variables, pin modes, etc
   pinMode(coachLights, OUTPUT); // Telling the arduino that the Light pin is an output
   pinMode(backyardLight, OUTPUT); // Telling the arduino that the Light pin is an output
   pinMode(floodLight, OUTPUT);  // Telling the arduino that the Light pin is an output
+  pinMode(wrongPasswordLight, OUTPUT); // Telling the arduino that the Light pin is an output
+  pinMode(rightPasswordLight, OUTPUT);  // Telling the arduino that the Light pin is an output
   pinMode(switchPin, INPUT); // Telling the arduino that Switch pin is an input
-  pinMode(pirPin, INPUT);
+  pinMode(pirPin, INPUT);   // Telling the arduino that the motion sensor is an input
   display.setBrightness(10); // Set brightness of LED display to 100%
   digitalWrite(pirPin, LOW);
 
   Serial.begin(9600);       //For debugging on serial port
-
-  Serial.begin(9600);
-  // In case the interrupt driver crashes on setup, give a clue
-  // to the user what's going on.
   Serial.println("Enabling IRin");
   irrecv.enableIRIn();          // Start the receiver
-  Serial.println("Enabled IRin");
 }
 
 void loop()                 // This function runs forever until it is on
 {
-  while (digitalRead(switchPin) == HIGH) //
-  {
+  while (digitalRead(switchPin) == HIGH) {
     delay (100);                        // Delay for 100 miliseconds
     timer = timer + 100;
     display.showNumberDec(timer);
     Serial.println(timer);
   }
-
-  if (timer > 100 && timer <= 1000)
-  {
+  if (timer > 100 && timer <= 1000) {
     isPorchLightOn = !isPorchLightOn;
     digitalWrite(porchLight, isPorchLightOn);
     timer = 0;
   }
-
-  if ( timer > 1000 && timer <= 3000)
-  {
+  if ( timer > 1000 && timer <= 3000) {
     areCoachLightsOn = !areCoachLightsOn;
     digitalWrite(coachLights, areCoachLightsOn);
     timer = 0;
   }
-
-  if (timer > 3000)
-  {
+  if (timer > 3000) {
     isBackyardLightOn = !isBackyardLightOn;
     digitalWrite(backyardLight, isBackyardLightOn);
     timer = 0;
   }
-  display.showNumberDec(0);
-
+  if (inputPassword.length() == "") {
+      display.showNumberDec(0);
+  }
   if (irrecv.decode(&results)) {
     Serial.println(results.value);
     if (results.value == ONE) {
@@ -124,7 +122,7 @@ void loop()                 // This function runs forever until it is on
     }
   }
   irrecv.resume(); // Receive the next value
-  delay(250);
+
   if (digitalRead(pirPin) == HIGH) {
     digitalWrite(floodLight, HIGH);   //the led visualizes the sensors output pin state
     if (lockLow) {
@@ -143,4 +141,53 @@ void loop()                 // This function runs forever until it is on
       lockLow = true;
     }
   }
+  int sensorValue1 = analogRead(A0);
+  int sensorValue2 = analogRead(A1);
+  int sensorValue3 = analogRead(A2);
+  int sensorValue4 = analogRead(A3);
+
+  if (sensorValue1 > 400) {
+    Serial.println(1);
+    passwordValue1 = "1";
+    inputPassword = inputPassword + passwordValue1;
+    Serial.println(inputPassword);
+//    display.showNumberDec(inputPassword);
+  }
+  if (sensorValue2 > 400) {
+    Serial.println(2);
+    passwordValue2 = "2";
+    inputPassword = inputPassword + passwordValue2;
+//    Serial.println(inputPassword);
+    
+  }
+  if (sensorValue3 > 400) {
+    Serial.println(3);
+    passwordValue3 = "3";
+    inputPassword = inputPassword + passwordValue3;
+    Serial.println(inputPassword);
+//    display.showNumberDec(inputPassword.toInt());
+  }
+  if (sensorValue4 > 400) {
+    Serial.println(4);
+    passwordValue4 = "4";
+    inputPassword = inputPassword + passwordValue4;
+    Serial.println(inputPassword);
+//    display.showNumberDec(inputPassword.toInt());
+  }
+  display.showNumberDec(inputPassword.toInt());
+  if (correctPassword == inputPassword) {
+    Serial.println("correct password");
+    inputPassword = "";
+    digitalWrite(rightPasswordLight, HIGH);
+    delay(2000);
+    digitalWrite(rightPasswordLight, LOW);
+  }
+  
+  if (inputPassword.length() >= 4) {
+    inputPassword = "";
+    digitalWrite(wrongPasswordLight, HIGH);
+    delay(2000);
+    digitalWrite(wrongPasswordLight, LOW);
+  }
+  delay(200);
 }

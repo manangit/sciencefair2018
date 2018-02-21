@@ -4,6 +4,7 @@
 */
 #include <TM1637Display.h>  // 4-digit Diplay library
 #include <IRremote.h> //IR Sensor library
+#include <Servo.h>  // Servo Motor library
 
 const int CLK = 6;          // Set the CLK pin connection to the display
 const int DIO = 7;          // Set the DIO pin connection to the display
@@ -25,6 +26,7 @@ bool areCoachLightsOn = false; // To track if the light is on or off
 bool isBackyardLightOn = false; // To track if the light is on or off
 int pirPin = 11;
 int servoMotor = 13;
+Servo Servo1;
 
 int RECV_PIN = 10;           //IR sensor should be conected to pin 10 on the arduino
 long ONE = 16724175;
@@ -56,6 +58,7 @@ void setup()               // It is used to initialize variables, pin modes, etc
   pinMode(rightPasswordLight, OUTPUT);  // Telling the arduino that the Light pin is an output
   pinMode(switchPin, INPUT); // Telling the arduino that Switch pin is an input
   pinMode(pirPin, INPUT);   // Telling the arduino that the motion sensor is an input
+  Servo1.attach(servoMotor);
   display.setBrightness(10); // Set brightness of LED display to 100%
   digitalWrite(pirPin, LOW);
 
@@ -88,7 +91,7 @@ void loop()                 // This function runs forever until it is on
     timer = 0;
   }
   if (inputPassword.length() == "") {
-      display.showNumberDec(0);
+    display.showNumberDec(0);
   }
   if (irrecv.decode(&results)) {
     Serial.println(results.value);
@@ -126,7 +129,6 @@ void loop()                 // This function runs forever until it is on
   if (digitalRead(pirPin) == HIGH) {
     digitalWrite(floodLight, HIGH);   //the led visualizes the sensors output pin state
     if (lockLow) {
-      //makes sure we wait for a transition to LOW before any further output is made:
       lockLow = false;
     }
     takeLowTime = true;
@@ -151,38 +153,36 @@ void loop()                 // This function runs forever until it is on
     passwordValue1 = "1";
     inputPassword = inputPassword + passwordValue1;
     Serial.println(inputPassword);
-//    display.showNumberDec(inputPassword);
   }
   if (sensorValue2 > 400) {
     Serial.println(2);
     passwordValue2 = "2";
     inputPassword = inputPassword + passwordValue2;
-//    Serial.println(inputPassword);
-    
+
   }
   if (sensorValue3 > 400) {
     Serial.println(3);
     passwordValue3 = "3";
     inputPassword = inputPassword + passwordValue3;
     Serial.println(inputPassword);
-//    display.showNumberDec(inputPassword.toInt());
   }
   if (sensorValue4 > 400) {
     Serial.println(4);
     passwordValue4 = "4";
     inputPassword = inputPassword + passwordValue4;
     Serial.println(inputPassword);
-//    display.showNumberDec(inputPassword.toInt());
   }
   display.showNumberDec(inputPassword.toInt());
   if (correctPassword == inputPassword) {
     Serial.println("correct password");
     inputPassword = "";
     digitalWrite(rightPasswordLight, HIGH);
-    delay(2000);
+    Servo1.write(90);
+    delay(3000);
     digitalWrite(rightPasswordLight, LOW);
+    Servo1.write(0);
   }
-  
+
   if (inputPassword.length() >= 4) {
     inputPassword = "";
     digitalWrite(wrongPasswordLight, HIGH);

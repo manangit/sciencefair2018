@@ -1,6 +1,6 @@
 /*
   My Science Fair Project
-  The one switch Smart Home
+  The Smart Home
 */
 #include <TM1637Display.h>  // 4-digit Diplay library
 #include <IRremote.h> //IR Sensor library
@@ -8,7 +8,6 @@
 
 const int CLK = 6;          // Set the CLK pin connection to the display
 const int DIO = 7;          // Set the DIO pin connection to the display
-
 TM1637Display display(CLK, DIO);  // set up the 4-Digit Display.
 
 long unsigned int lowIn;
@@ -25,6 +24,7 @@ bool isPorchLightOn = false; // To track if the light is on or off
 bool areCoachLightsOn = false; // To track if the light is on or off
 bool isBackyardLightOn = false; // To track if the light is on or off
 int pirPin = 11;
+
 int servoMotor = 13;
 Servo Servo1;
 
@@ -143,6 +143,7 @@ void loop()                 // This function runs forever until it is on
       lockLow = true;
     }
   }
+  
   int sensorValue1 = analogRead(A0);
   int sensorValue2 = analogRead(A1);
   int sensorValue3 = analogRead(A2);
@@ -158,7 +159,6 @@ void loop()                 // This function runs forever until it is on
     Serial.println(2);
     passwordValue2 = "2";
     inputPassword = inputPassword + passwordValue2;
-
   }
   if (sensorValue3 > 400) {
     Serial.println(3);
@@ -182,7 +182,6 @@ void loop()                 // This function runs forever until it is on
     digitalWrite(rightPasswordLight, LOW);
     Servo1.write(0);
   }
-
   if (inputPassword.length() >= 4) {
     inputPassword = "";
     digitalWrite(wrongPasswordLight, HIGH);

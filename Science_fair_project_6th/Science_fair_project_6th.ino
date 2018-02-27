@@ -2,7 +2,7 @@
   My Science Fair Project
   The Smart Home
 */
-#include <TM1637Display.h>  // 4-digit Diplay library
+#include <TM1637Display.h>  // 4-digit Display library
 #include <IRremote.h> //IR Sensor library
 #include <Servo.h>  // Servo Motor library
 
@@ -15,9 +15,9 @@ long unsigned int pause = 5000;
 boolean lockLow = true;
 boolean takeLowTime;
 
-int porchLight = 2;         // Prorch light should be conected to pin 2 on the arduino
-int coachLights = 4;        // Coach lights should be conected to pin 4 on the arduino
-int backyardLight = 8;      // Backyard light should be conected to pin 8 on the arduino
+int porchLight = 2;         // Porch light should be connected to pin 2 on the arduino
+int coachLights = 4;        // Coach lights should be connected to pin 4 on the arduino
+int backyardLight = 8;      // Backyard light should be connected to pin 8 on the arduino
 int floodLight = 9;
 int switchPin = 12;         // Switch should be conected to pin 12 on the arduino
 bool isPorchLightOn = false; // To track if the light is on or off
@@ -143,7 +143,7 @@ void loop()                 // This function runs forever until it is on
       lockLow = true;
     }
   }
-  
+
   int sensorValue1 = analogRead(A0);
   int sensorValue2 = analogRead(A1);
   int sensorValue3 = analogRead(A2);
